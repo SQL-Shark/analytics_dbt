@@ -1,0 +1,11 @@
+analytics_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      user: dbuser
+      pass: dbpass
+      port: 5432
+      dbname: analytics
+      schema: analytics_dbt

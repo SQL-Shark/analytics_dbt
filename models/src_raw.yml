@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: raw      # reference as source('raw', 'chicago_crimes')
+    database: analytics
+    schema: public
+    tables:
+      - name: raw_chicago_crimes
