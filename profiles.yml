@@ -3,9 +3,9 @@ analytics_dbt:
   outputs:
     dev:
       type: postgres
-      host: localhost
+      host: 127.0.0.1        # or “127.0.0.1”
       user: dbuser
-      pass: dbpass
+      password: dbpass
       port: 5432
       dbname: analytics
-      schema: analytics_dbt
+      schema: staging

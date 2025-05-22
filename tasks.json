@@ -1,0 +1,21 @@
+// .vscode/tasks.json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dbt debug",
+      "type": "shell",
+      "command": "dbt debug"
+    },
+    {
+      "label": "dbt run",
+      "type": "shell",
+      "command": "dbt run"
+    },
+    {
+      "label": "dbt test",
+      "type": "shell",
+      "command": "dbt test"
+    }
+  ]
+}
