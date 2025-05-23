@@ -3,7 +3,7 @@ analytics_dbt:
   outputs:
     dev:
       type: postgres
-      host: 127.0.0.1        # or “127.0.0.1”
+      host: 127.18.0.2        # or “127.0.0.1”
       user: dbuser
       password: dbpass
       port: 5432

@@ -2,7 +2,7 @@ name: analytics_dbt
 version: '1.0'
 config-version: 2
 
-profile: analytics_dbt  # This should match the name in your `profiles.yml`
+profile: analytics_dbt
 
 model-paths: ["models"]
 seed-paths: ["seeds"]
@@ -18,4 +18,5 @@ clean-targets:
 
 models:
   analytics_dbt:
-    +materialized: view
+    staging:
+      +materialized: view
