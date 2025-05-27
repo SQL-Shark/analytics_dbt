@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_chicago_crimes
+    description: "Cleaned and standardized Chicago crimes data"
+    columns:
+      - name: crime_id
+        description: "Unique identifier for each crime incident"
+        tests:
+          - not_null
+          - unique
+      - name: case_number
+        description: "Chicago Police Department case number"
+        tests:
+          - not_null
+      - name: incident_datetime
+        description: "Date and time when the incident occurred"
+        tests:
+          - not_null
+      - name: primary_crime_type
+        description: "Primary classification of the crime"
+        tests:
+          - not_null
+      - name: data_quality_flag
+        description: "Flag indicating data completeness"
+        tests:
+          - accepted_values:
+              values: ['VALID', 'MISSING_DATE', 'MISSING_CRIME_TYPE', 'MISSING_LOCATION']

@@ -1,0 +1,76 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "Date dimension for time-based analysis"
+    columns:
+      - name: date_key
+        description: "Surrogate key in YYYYMMDD format"
+        tests:
+          - not_null
+          - unique
+      - name: calendar_date
+        description: "Calendar date"
+        tests:
+          - not_null
+
+  - name: dim_crime_type
+    description: "Crime type classifications and hierarchy"
+    columns:
+      - name: crime_type_key
+        description: "Surrogate key for crime type"
+        tests:
+          - not_null
+          - unique
+      - name: iucr_code
+        description: "Illinois Uniform Crime Reporting code"
+        tests:
+          - not_null
+
+  - name: dim_location
+    description: "Geographic locations and administrative boundaries"
+    columns:
+      - name: location_key
+        description: "Surrogate key for location"
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_case
+    description: "Case-level attributes and classifications"
+    columns:
+      - name: case_key
+        description: "Surrogate key for case"
+        tests:
+          - not_null
+          - unique
+      - name: case_number
+        description: "Police case number"
+        tests:
+          - not_null
+
+  - name: fact_crime_incidents
+    description: "Fact table containing crime incident measures"
+    columns:
+      - name: incident_key
+        description: "Primary key for fact table"
+        tests:
+          - not_null
+          - unique
+      - name: incident_date_key
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: crime_type_key
+        description: "Foreign key to crime type dimension"
+        tests:
+          - relationships:
+              to: ref('dim_crime_type')
+              field: crime_type_key
+      - name: incident_count
+        description: "Count of incidents (always 1 for grain)"
+        tests:
+          - not_null

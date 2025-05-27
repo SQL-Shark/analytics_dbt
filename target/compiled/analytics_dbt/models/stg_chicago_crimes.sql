@@ -3,8 +3,8 @@
 
 with raw as (
   select
-    "Case_Number"   as case_number,    -- lower-case alias
-    "Date",
+    case_number  as case_number,    -- lower-case alias
+    date,
     primary_type,
     description,
     location_description,

@@ -1,0 +1,16 @@
+chicago_crimes:
+  outputs:
+    dev:
+      type: postgres
+      host: localhost #127.18.0.2        # or “127.0.0.1”
+      user: dbuser
+      password: dbpass
+      port: 5432
+      dbname: analytics
+      schema: staging
+      threads: 1
+      keepalives_idle: 0 # default 0, indicating the system default. See below
+      connect_timeout: 10 # default 10 seconds
+      retries: 1  # default 1 retry on error/timeout when opening connections
+  target: dev
+  
