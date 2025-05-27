@@ -58,3 +58,4 @@ WITH raw_data AS (
 )
 
 SELECT * FROM raw_data
+WHERE incident_year >= 2015
