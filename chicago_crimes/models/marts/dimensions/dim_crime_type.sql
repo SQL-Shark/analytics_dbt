@@ -4,22 +4,54 @@
   )
 }}
 
-WITH crime_types AS (
-  SELECT DISTINCT
+WITH crime_type_counts AS (
+  -- Count occurrences of each fbi_code per business key combination
+  SELECT 
     iucr_code,
     primary_crime_type,
     crime_description,
-    fbi_code
+    fbi_code,
+    COUNT(*) as fbi_code_count
   FROM {{ ref('stg_chicago_crimes') }}
   WHERE iucr_code IS NOT NULL
     AND primary_crime_type IS NOT NULL
     AND crime_description IS NOT NULL
+  GROUP BY iucr_code, primary_crime_type, crime_description, fbi_code
+),
+
+most_common_fbi AS (
+  -- Get the most frequent fbi_code for each business key combination
+  SELECT 
+    iucr_code,
+    primary_crime_type,
+    crime_description,
+    fbi_code,
+    ROW_NUMBER() OVER (
+      PARTITION BY iucr_code, primary_crime_type, crime_description 
+      ORDER BY fbi_code_count DESC, fbi_code
+    ) as rn
+  FROM crime_type_counts
+),
+
+crime_types AS (
+  -- Keep only the most common fbi_code (rn = 1)
+  SELECT 
+    iucr_code,
+    primary_crime_type,
+    crime_description,
+    fbi_code
+  FROM most_common_fbi
+  WHERE rn = 1
 ),
 
 crime_type_dimension AS (
   SELECT
-    -- Use ROW_NUMBER to ensure unique keys
-    ROW_NUMBER() OVER (ORDER BY iucr_code, primary_crime_type, crime_description) AS crime_type_key,
+    -- Use the business key combination as the basis for surrogate key
+    {{ dbt_utils.generate_surrogate_key([
+        'iucr_code',
+        'primary_crime_type', 
+        'crime_description'
+    ]) }} AS crime_type_key,
     
     -- Natural keys
     iucr_code,

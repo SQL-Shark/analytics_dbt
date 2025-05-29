@@ -6,23 +6,25 @@
 
 WITH cases AS (
   SELECT DISTINCT
+    crime_id,
     case_number,
     was_arrest_made,
     is_domestic_violence,
     data_quality_flag
   FROM {{ ref('stg_chicago_crimes') }}
-  WHERE case_number IS NOT NULL
+  WHERE crime_id IS NOT NULL
 ),
 
 case_dimension AS (
   SELECT
-    -- Use ROW_NUMBER to ensure unique keys
-    ROW_NUMBER() OVER (ORDER BY case_number) AS case_key,
+    -- Use crime_id as the basis for case_key (1:1 with incidents)
+    {{ dbt_utils.generate_surrogate_key(['crime_id']) }} AS case_key,
     
-    -- Natural key
+    -- Natural keys
+    crime_id,
     case_number,
     
-    -- Case attributes
+    -- Case attributes (incident-level)
     was_arrest_made,
     is_domestic_violence,
     
@@ -46,6 +48,7 @@ case_dimension AS (
     CURRENT_TIMESTAMP AS created_at
   FROM cases
 )
+
 
 SELECT * FROM case_dimension
 ORDER BY case_number

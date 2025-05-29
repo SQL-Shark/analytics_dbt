@@ -11,8 +11,8 @@
 
 WITH fact_data AS (
   SELECT
-    -- Use the actual crime_id as the natural key since it's already unique
-    crimes.crime_id AS incident_key,
+    -- Simple surrogate key since crime_id should be unique
+    {{ dbt_utils.generate_surrogate_key(['crimes.crime_id']) }} AS incident_key,
     
     -- Natural key
     crimes.crime_id,
@@ -35,7 +35,7 @@ WITH fact_data AS (
     -- Measures and facts
     1 AS incident_count,
     
-    -- Additive measures for different analysis needs
+    -- Additive measures
     CASE WHEN crimes.was_arrest_made = TRUE THEN 1 ELSE 0 END AS arrest_count,
     CASE WHEN crimes.is_domestic_violence = TRUE THEN 1 ELSE 0 END AS domestic_violence_count,
     
@@ -50,20 +50,36 @@ WITH fact_data AS (
   FROM {{ ref('stg_chicago_crimes') }} AS crimes
   
   -- Join to dimension tables to get surrogate keys
-  LEFT JOIN {{ ref('dim_crime_type') }} AS crime_types
+  LEFT JOIN (
+    SELECT DISTINCT 
+      iucr_code, primary_crime_type, crime_description, crime_type_key
+    FROM {{ ref('dim_crime_type') }}
+  ) AS crime_types
     ON crimes.iucr_code = crime_types.iucr_code
     AND crimes.primary_crime_type = crime_types.primary_crime_type
     AND crimes.crime_description = crime_types.crime_description
     
-  LEFT JOIN {{ ref('dim_location') }} AS locations
-    ON COALESCE(crimes.beat, 'Unknown') = locations.beat
-    AND COALESCE(crimes.district, 'Unknown') = locations.district
-    AND COALESCE(crimes.ward::text, 'Unknown') = locations.ward
-    AND COALESCE(crimes.community_area, 'Unknown') = locations.community_area
+  LEFT JOIN (
+    SELECT DISTINCT 
+      beat, district, ward, community_area, location_description, 
+      latitude, longitude, location_key
+    FROM {{ ref('dim_location') }}
+  ) AS locations
+    ON COALESCE(crimes.beat::text, '-1') = locations.beat
+    AND COALESCE(crimes.district::text, '-1') = locations.district
+    AND COALESCE(crimes.ward::text, '-1') = locations.ward
+    AND COALESCE(crimes.community_area::text, '-1') = locations.community_area
     AND COALESCE(crimes.location_description, 'Unknown') = locations.location_description
+    AND COALESCE(crimes.latitude, 0) = COALESCE(locations.latitude, 0)
+    AND COALESCE(crimes.longitude, 0) = COALESCE(locations.longitude, 0)
     
-  LEFT JOIN {{ ref('dim_case') }} AS cases
-    ON crimes.case_number = cases.case_number
+  -- JOIN ON CRIME_ID, NOT CASE_NUMBER!
+  LEFT JOIN (
+    SELECT DISTINCT 
+      crime_id, case_key
+    FROM {{ ref('dim_case') }}
+  ) AS cases
+    ON crimes.crime_id = cases.crime_id
     
   -- Data quality filter
   WHERE crimes.data_quality_flag = 'VALID'
