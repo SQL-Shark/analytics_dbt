@@ -1,0 +1,52 @@
+# Environment variables
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# dbt
+dbt_project/logs/
+dbt_project/target/
+dbt_project/dbt_packages/
+dbt_project/chicago_crimes/logs/
+dbt_project/chicago_crimes/target/
+dbt_project/chicago_crimes/dbt_packages/
+
+# Data directories (don't commit sensitive data)
+postgres_data/
+airbyte_data/
+metabase_data/
+data/raw/
+*.csv
+*.json
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Docker
+.dockerignore
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Temporary files
+*.tmp
+*.temp
